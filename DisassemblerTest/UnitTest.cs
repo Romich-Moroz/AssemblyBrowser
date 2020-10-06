@@ -1,5 +1,4 @@
 using DisassemblerLib;
-using Microsoft.VisualBasic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 

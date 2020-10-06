@@ -7,34 +7,9 @@
         xmlns:disasm="clr-namespace:DisassemblerLib;assembly=Disassembler"
         mc:Ignorable="d"
         Title="Assembly browser" Height="450" Width="800">
-
-    <Window.Resources>
-
-        <DataTemplate DataType="{x:Type disasm:MemberInfo}">
-            <StackPanel>
-                <TextBlock Text="{Binding Name}"/>
-                <TextBlock Text="{Binding TypeName}"/>
-            </StackPanel>
-        </DataTemplate>
-        
-        <DataTemplate DataType="{x:Type disasm:MethodInfo}">
-            <StackPanel>
-                <TextBlock Text="{Binding Name}"/>
-                <TextBlock Text="{Binding Signature}"/>
-            </StackPanel>
-        </DataTemplate>
-
-        <HierarchicalDataTemplate DataType="{x:Type disasm:NamespaceInfo}" ItemsSource="{Binding Classes}">
-            
-        </HierarchicalDataTemplate>
-        
-    </Window.Resources>
     
     <Grid>
-        
-        
-        
-        
+  
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
@@ -44,7 +19,6 @@
         </Menu>
         <TreeView Grid.Row="1" BorderThickness="0">
             <TreeView.Resources>
-
                 <HierarchicalDataTemplate DataType="{x:Type disasm:MemberInfo}">
                     <TextBlock Text="{Binding TypeName}"/>
                 </HierarchicalDataTemplate>
@@ -63,14 +37,7 @@
                     </HierarchicalDataTemplate.ItemTemplate>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
-            <TreeViewItem ItemsSource="{Binding SelectedAssemblyInfo.Namespaces}" Header="{Binding SelectedAssemblyInfo.Name}">
-                
-            </TreeViewItem>
-            
-
-
+            <TreeViewItem ItemsSource="{Binding SelectedAssemblyInfo.Namespaces}" Header="{Binding SelectedAssemblyInfo.Name}"/>
         </TreeView>
-
-
     </Grid>
 </Window>

@@ -1,7 +1,5 @@
 ﻿using DisassemblerLib;
 using System.ComponentModel;
-using System.IO;
-using System.Reflection;
 using System.Windows.Input;
 
 namespace AssemblyBrowser
