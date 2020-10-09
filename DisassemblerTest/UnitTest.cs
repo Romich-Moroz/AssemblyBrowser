@@ -52,14 +52,16 @@ namespace DisassemblerTest
             
         }
         [TestMethod]
-        public void MembersTest()
+        public void ValuesTest()
         {
             foreach (NamespaceInfo n in actual.Namespaces)
             {
                 foreach (ClassInfo c in n.Classes)
                 {
-                    CollectionAssert.AllItemsAreNotNull(c.Members);
-                    CollectionAssert.AllItemsAreUnique(c.Members);
+                    CollectionAssert.AllItemsAreNotNull(c.Fields);
+                    CollectionAssert.AllItemsAreUnique(c.Fields);
+                    CollectionAssert.AllItemsAreNotNull(c.Properties);
+                    CollectionAssert.AllItemsAreUnique(c.Properties);
                 }
             }
         }

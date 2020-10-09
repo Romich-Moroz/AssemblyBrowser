@@ -6,13 +6,23 @@ using System.Runtime.CompilerServices;
 
 namespace DisassemblerLib
 {
-    public class MemberInfo
+    public class PropertyInfo
     {
-        public string TypeName { get; set; }
+        public string PropertyName { get; set; }
 
-        public MemberInfo(string TypeName)
+        public PropertyInfo(string PropertyName)
         {
-            this.TypeName = TypeName;
+            this.PropertyName = PropertyName;
+        }
+    }
+
+    public class FieldInfo
+    {
+        public string FieldName { get; set; }
+
+        public FieldInfo(string FieldName)
+        {
+            this.FieldName = FieldName;
         }
     }
 
@@ -30,7 +40,9 @@ namespace DisassemblerLib
     {
         public string Name { get; set; }
 
-        public ObservableCollection<MemberInfo> Members { get; set; } = new ObservableCollection<MemberInfo>();
+        public ObservableCollection<PropertyInfo> Properties { get; set; } = new ObservableCollection<PropertyInfo>();
+
+        public ObservableCollection<FieldInfo> Fields { get; set; } = new ObservableCollection<FieldInfo>();
 
         public ObservableCollection<MethodInfo> Methods { get; set; } = new ObservableCollection<MethodInfo>();
 
@@ -60,21 +72,23 @@ namespace DisassemblerLib
             AssemblyInfo ai = new AssemblyInfo(asm.FullName);
             foreach (Type t in asm.GetTypes())
             {
-                NamespaceInfo ni = new NamespaceInfo(t.Namespace ?? "global");               
+                NamespaceInfo ni = new NamespaceInfo(t.Namespace ?? "<global>");               
                 if (!ai.Namespaces.Any(n => n.Name == ni.Name) && !IsExtensionClass(t))
                     ai.Namespaces.Add(ni);
                 else
                     ni = ai.Namespaces.First(n => n.Name == ni.Name);
                 ClassInfo ci = new ClassInfo(t.Name);
                 ni.Classes.Add(ci);
-                foreach (System.Reflection.MemberInfo mi in t.GetMembers())
-                    ci.Members.Add(new MemberInfo(mi.DeclaringType.ToString() +' ' + mi.Name));
-                foreach (System.Reflection.MethodInfo mi in t.GetMethods())
+                foreach (System.Reflection.FieldInfo fi in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                    ci.Fields.Add(new FieldInfo(fi.FieldType.Name +' ' + fi.Name));
+                foreach (System.Reflection.PropertyInfo pi in t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                    ci.Properties.Add(new PropertyInfo(pi.PropertyType.Name + ' ' + pi.Name));
+                foreach (System.Reflection.MethodInfo mi in t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
                 {
                     if (IsExtensionMethod(mi))
                     {
                         Type extType = mi.GetParameters()[0].ParameterType;
-                        NamespaceInfo extNi = new NamespaceInfo(extType.Namespace ?? "global");
+                        NamespaceInfo extNi = new NamespaceInfo(extType.Namespace ?? "<global>");
                         if (!ai.Namespaces.Any(n => n.Name == extNi.Name) && !IsExtensionClass(t))
                             ai.Namespaces.Add(extNi);
                         else

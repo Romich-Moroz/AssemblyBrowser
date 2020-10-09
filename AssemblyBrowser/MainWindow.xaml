@@ -19,8 +19,11 @@
         </Menu>
         <TreeView Grid.Row="1" BorderThickness="0">
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type disasm:MemberInfo}">
-                    <TextBlock Text="{Binding TypeName}"/>
+                <HierarchicalDataTemplate DataType="{x:Type disasm:FieldInfo}">
+                    <TextBlock Text="{Binding FieldName}"/>
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type disasm:PropertyInfo}">
+                    <TextBlock Text="{Binding PropertyName}"/>
                 </HierarchicalDataTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type disasm:MethodInfo}">
                     <TextBlock Text="{Binding Signature}"/>
@@ -30,7 +33,8 @@
                     <HierarchicalDataTemplate.ItemTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type disasm:ClassInfo}">
                             <TreeViewItem Header="{Binding Name}">
-                                <TreeViewItem Header="Members" ItemsSource="{Binding Members}"/>
+                                <TreeViewItem Header="Fields" ItemsSource="{Binding Fields}"/>
+                                <TreeViewItem Header="Properties" ItemsSource="{Binding Properties}"/>
                                 <TreeViewItem Header="Methods" ItemsSource="{Binding Methods}"/>
                             </TreeViewItem>
                         </HierarchicalDataTemplate>
