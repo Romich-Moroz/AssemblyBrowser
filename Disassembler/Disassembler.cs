@@ -64,53 +64,55 @@ namespace DisassemblerLib
                     ni = ai.Namespaces.First(n => n.Name == ni.Name);
 
                 ClassInfo ci = new ClassInfo(t);
-                ni.Classes.Add(ci);
-
-                foreach (ConstructorInfo pi in t.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                    ci.Constructors.Add(pi);
-
-                List<System.Reflection.MethodInfo> propertyAccessors = new List<System.Reflection.MethodInfo>();
-                List<string> backingFieldNames = new List<string>(); 
-
-                foreach (PropertyInfo pi in t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                if (Attribute.GetCustomAttribute(t, typeof(CompilerGeneratedAttribute)) == null)
                 {
-                    ci.Properties.Add(pi);
-                    propertyAccessors.AddRange(pi.GetAccessors(true));
-                    backingFieldNames.Add("<" + pi.Name + ">k__BackingField");
-                }
+                    ni.Classes.Add(ci);
 
-                foreach (FieldInfo fi in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                {
-                    if (!backingFieldNames.Contains(fi.Name))
+                    foreach (ConstructorInfo pi in t.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                        ci.Constructors.Add(pi);
+
+                    List<System.Reflection.MethodInfo> propertyAccessors = new List<System.Reflection.MethodInfo>();
+                    List<string> backingFieldNames = new List<string>();
+
+                    foreach (PropertyInfo pi in t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
                     {
-                        ci.Fields.Add(fi);
+                        ci.Properties.Add(pi);
+                        propertyAccessors.AddRange(pi.GetAccessors(true));
+                        backingFieldNames.Add("<" + pi.Name + ">k__BackingField");
                     }
-                }                   
 
-                foreach (System.Reflection.MethodInfo mi in t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                {
-                    if (!propertyAccessors.Contains(mi))
+                    foreach (FieldInfo fi in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
                     {
-                        if (IsExtensionMethod(mi))
+                        if (!backingFieldNames.Contains(fi.Name))
                         {
-                            Type extType = mi.GetParameters()[0].ParameterType;
-                            NamespaceInfo extNi = new NamespaceInfo(extType.Namespace ?? "<global>");
-                            if (!ai.Namespaces.Any(n => n.Name == extNi.Name) && !IsExtensionClass(t))
-                                ai.Namespaces.Add(extNi);
-                            else
-                                extNi = ai.Namespaces.First(n => n.Name == extNi.Name);
-                            ClassInfo extCi = new ClassInfo(extType);
-                            if (!extNi.Classes.Any(n => n.ClassType.Name == extCi.ClassType.Name))
-                                extNi.Classes.Add(extCi);
-                            else
-                                extCi = extNi.Classes.First(n => n.ClassType.Name == extCi.ClassType.Name);
-                            extCi.Methods.Add(new MethodInfo(mi, true));
+                            ci.Fields.Add(fi);
                         }
-                        else
-                            ci.Methods.Add(new MethodInfo(mi));
-                    }                   
-                }
-                    
+                    }
+
+                    foreach (System.Reflection.MethodInfo mi in t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                    {
+                        if (!propertyAccessors.Contains(mi))
+                        {
+                            if (IsExtensionMethod(mi))
+                            {
+                                Type extType = mi.GetParameters()[0].ParameterType;
+                                NamespaceInfo extNi = new NamespaceInfo(extType.Namespace ?? "<global>");
+                                if (!ai.Namespaces.Any(n => n.Name == extNi.Name) && !IsExtensionClass(t))
+                                    ai.Namespaces.Add(extNi);
+                                else
+                                    extNi = ai.Namespaces.First(n => n.Name == extNi.Name);
+                                ClassInfo extCi = new ClassInfo(extType);
+                                if (!extNi.Classes.Any(n => n.ClassType.Name == extCi.ClassType.Name))
+                                    extNi.Classes.Add(extCi);
+                                else
+                                    extCi = extNi.Classes.First(n => n.ClassType.Name == extCi.ClassType.Name);
+                                extCi.Methods.Add(new MethodInfo(mi, true));
+                            }
+                            else
+                                ci.Methods.Add(new MethodInfo(mi));
+                        }
+                    }
+                }        
             }
             return ai;
         }
