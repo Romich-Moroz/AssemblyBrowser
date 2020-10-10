@@ -57,15 +57,17 @@ namespace DisassemblerLib
             foreach (Type t in asm.GetTypes())
             {
                 
-                NamespaceInfo ni = new NamespaceInfo(t.Namespace ?? "<global>");               
-                if (!ai.Namespaces.Any(n => n.Name == ni.Name) && !IsExtensionClass(t))
-                    ai.Namespaces.Add(ni);
-                else
-                    ni = ai.Namespaces.First(n => n.Name == ni.Name);
+                
 
                 ClassInfo ci = new ClassInfo(t);
                 if (Attribute.GetCustomAttribute(t, typeof(CompilerGeneratedAttribute)) == null)
                 {
+                    NamespaceInfo ni = new NamespaceInfo(t.Namespace ?? "<global>");
+                    if (!ai.Namespaces.Any(n => n.Name == ni.Name) && !IsExtensionClass(t))
+                        ai.Namespaces.Add(ni);
+                    else
+                        ni = ai.Namespaces.First(n => n.Name == ni.Name);
+
                     ni.Classes.Add(ci);
 
                     foreach (ConstructorInfo pi in t.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
