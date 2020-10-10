@@ -56,8 +56,6 @@ namespace DisassemblerLib
             AssemblyInfo ai = new AssemblyInfo(asm);
             foreach (Type t in asm.GetTypes())
             {
-                
-                
 
                 ClassInfo ci = new ClassInfo(t);
                 if (Attribute.GetCustomAttribute(t, typeof(CompilerGeneratedAttribute)) == null)
