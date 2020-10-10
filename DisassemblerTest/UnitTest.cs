@@ -39,29 +39,43 @@ namespace DisassemblerTest
             
         }
         [TestMethod]
-        public void MethodsTest()
+        public void MembersTest()
         {
             foreach(NamespaceInfo n in actual.Namespaces)
             {
                 foreach(ClassInfo c in n.Classes)
                 {
                     CollectionAssert.AllItemsAreNotNull(c.Methods);
-                    CollectionAssert.AllItemsAreUnique(c.Methods);                    
+                    CollectionAssert.AllItemsAreUnique(c.Methods);
+                    CollectionAssert.AllItemsAreNotNull(c.Fields);
+                    CollectionAssert.AllItemsAreUnique(c.Fields);
+                    CollectionAssert.AllItemsAreNotNull(c.Properties);
+                    CollectionAssert.AllItemsAreUnique(c.Properties);
                 }
-            }
-            
+            }            
         }
+
         [TestMethod]
-        public void ValuesTest()
+        public void MembersValuesTest()
         {
             foreach (NamespaceInfo n in actual.Namespaces)
             {
                 foreach (ClassInfo c in n.Classes)
                 {
-                    CollectionAssert.AllItemsAreNotNull(c.Fields);
-                    CollectionAssert.AllItemsAreUnique(c.Fields);
-                    CollectionAssert.AllItemsAreNotNull(c.Properties);
-                    CollectionAssert.AllItemsAreUnique(c.Properties);
+                    foreach(DisassemblerLib.FieldInfo m in c.Fields)
+                    {
+                        Assert.IsNotNull(m.FieldName);
+                        Assert.IsNotNull(m.FieldType);
+                    }
+                    foreach (DisassemblerLib.PropertyInfo p in c.Properties)
+                    {
+                        Assert.IsNotNull(p.PropertyName);
+                        Assert.IsNotNull(p.PropertyType);
+                    }
+                    foreach (DisassemblerLib.MethodInfo m in c.Methods)
+                    {
+                        Assert.IsNotNull(m.Signature);
+                    }
                 }
             }
         }
