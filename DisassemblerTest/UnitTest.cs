@@ -1,18 +1,45 @@
 using DisassemblerLib;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Reflection;
 
 namespace DisassemblerTest
 {
+
+    class Foo
+    {
+        public static Foo CreateFromFuncs<T1, T2>(Func<T1, T2> f1, Func<T2, T1> f2)
+        {
+            return null;
+        }
+    }
+
+    public static class MyExtensions
+    {
+        public static int WordCount(this string str)
+        {
+            return str.Split(new char[] { ' ', '.', '?' },
+                             StringSplitOptions.RemoveEmptyEntries).Length;
+        }
+        public static int Asd()
+        {
+            return 0;
+        }
+    }
+
     [TestClass]
     public class UnitTest
     {
+
+        
+
+
         private static AssemblyInfo actual;
 
         [ClassInitialize]
         public static void TestInit(TestContext tc)
         {
-            actual = new Disassembler().Disassemble(Assembly.LoadFrom("Disassembler.dll"));
+            actual = new Disassembler().Disassemble(Assembly.LoadFrom("DisassemblerTest.dll"));
         }
 
         [TestMethod]
@@ -62,19 +89,19 @@ namespace DisassemblerTest
             {
                 foreach (ClassInfo c in n.Classes)
                 {
-                    foreach(DisassemblerLib.FieldInfo m in c.Fields)
+                    foreach(FieldInfo m in c.Fields)
                     {
-                        Assert.IsNotNull(m.FieldName);
+                        Assert.IsNotNull(m.Name);
                         Assert.IsNotNull(m.FieldType);
                     }
-                    foreach (DisassemblerLib.PropertyInfo p in c.Properties)
+                    foreach (PropertyInfo p in c.Properties)
                     {
-                        Assert.IsNotNull(p.PropertyName);
+                        Assert.IsNotNull(p.Name);
                         Assert.IsNotNull(p.PropertyType);
                     }
                     foreach (DisassemblerLib.MethodInfo m in c.Methods)
                     {
-                        Assert.IsNotNull(m.Signature);
+                        Assert.IsNotNull(m.Info);
                     }
                 }
             }

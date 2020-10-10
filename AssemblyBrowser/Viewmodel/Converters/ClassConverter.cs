@@ -1,22 +1,17 @@
-﻿using DisassemblerLib;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
+using DisassemblerLib;
 
 namespace AssemblyBrowser
 {
-    [ValueConversion(typeof(PropertyInfo), typeof(string))]
-    class PropertyConverter : IValueConverter
-    {        
+    class ClassConverter : IValueConverter
+    {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is PropertyInfo v)
-                return v.PropertyType.Name + ' ' + v.PropertyName;
-            return null;
+            ClassInfo c = value as ClassInfo;
+            return TypenameBuilder.BuildTypename(c.ClassType.Name, c.ClassType.GetGenericArguments());
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

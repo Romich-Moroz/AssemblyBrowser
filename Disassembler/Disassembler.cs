@@ -1,71 +1,51 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace DisassemblerLib
 {
-    public class PropertyInfo
-    {
-        public Type PropertyType { get; set; }
-        public string PropertyName { get; set; }
-
-        public PropertyInfo(Type PropertyType, string PropertyName)
-        {
-            this.PropertyType = PropertyType;
-            this.PropertyName = PropertyName;
-        }
-    }
-
-    public class FieldInfo
-    {
-        public Type FieldType { get; set; }
-        public string FieldName { get; set; }
-
-        public FieldInfo(Type FieldType, string FieldName)
-        {
-            this.FieldType = FieldType;
-            this.FieldName = FieldName;
-        }
-    }
 
     public class MethodInfo
     {
-        public string Signature { get; set; }
+        public System.Reflection.MethodInfo Info { get; set; }
 
-        public MethodInfo(string Signature)
+        public bool IsExtension { get; set; }
+
+        public MethodInfo(System.Reflection.MethodInfo mInfo, bool IsExtension = false)
         {
-            this.Signature = Signature;
+            this.Info = mInfo;           
+            this.IsExtension = IsExtension;
         }
     }
 
     public class ClassInfo
     {
-        public string Name { get; set; }
+        public Type ClassType { get; set; }
 
-        public ObservableCollection<PropertyInfo> Properties { get; set; } = new ObservableCollection<PropertyInfo>();
+        public List<PropertyInfo> Properties { get; set; } = new List<PropertyInfo>();
 
-        public ObservableCollection<FieldInfo> Fields { get; set; } = new ObservableCollection<FieldInfo>();
+        public List<FieldInfo> Fields { get; set; } = new List<FieldInfo>();
 
-        public ObservableCollection<MethodInfo> Methods { get; set; } = new ObservableCollection<MethodInfo>();
+        public List<MethodInfo> Methods { get; set; } = new List<MethodInfo>();
 
-        public ClassInfo(string Name) => this.Name = Name;
+        public List<ConstructorInfo> Constructors { get; set; } = new List<ConstructorInfo>();
+
+        public ClassInfo(Type t) => this.ClassType = t;
 
     }
     public class NamespaceInfo
     {
         public string Name { get; set; }
-        public ObservableCollection<ClassInfo> Classes { get; set; } = new ObservableCollection<ClassInfo>();
-
+        public List<ClassInfo> Classes { get; set; } = new List<ClassInfo>();
         public NamespaceInfo(string Name) => this.Name = Name;
     }
     public class AssemblyInfo
     {
-        public string Name { get; set; }
-        public ObservableCollection<NamespaceInfo> Namespaces { get; set; } = new ObservableCollection<NamespaceInfo>();
-
-        public AssemblyInfo(string Name) => this.Name = Name;
+        public Assembly Asm { get; set; }
+        public List<NamespaceInfo>Namespaces { get; set; } = new List<NamespaceInfo>();
+        public AssemblyInfo(Assembly Asm) => this.Asm = Asm;
 
     }
 
@@ -73,39 +53,62 @@ namespace DisassemblerLib
     {
         public AssemblyInfo Disassemble(Assembly asm)
         {
-            AssemblyInfo ai = new AssemblyInfo(asm.FullName);
+            AssemblyInfo ai = new AssemblyInfo(asm);
             foreach (Type t in asm.GetTypes())
             {
+                
                 NamespaceInfo ni = new NamespaceInfo(t.Namespace ?? "<global>");               
                 if (!ai.Namespaces.Any(n => n.Name == ni.Name) && !IsExtensionClass(t))
                     ai.Namespaces.Add(ni);
                 else
                     ni = ai.Namespaces.First(n => n.Name == ni.Name);
-                ClassInfo ci = new ClassInfo(t.Name);
+
+                ClassInfo ci = new ClassInfo(t);
                 ni.Classes.Add(ci);
-                foreach (System.Reflection.FieldInfo fi in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                    ci.Fields.Add(new FieldInfo(fi.FieldType, fi.Name));
-                foreach (System.Reflection.PropertyInfo pi in t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                    ci.Properties.Add(new PropertyInfo(pi.PropertyType, pi.Name));
+
+                foreach (ConstructorInfo pi in t.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                    ci.Constructors.Add(pi);
+
+                List<System.Reflection.MethodInfo> propertyAccessors = new List<System.Reflection.MethodInfo>();
+                List<string> backingFieldNames = new List<string>(); 
+
+                foreach (PropertyInfo pi in t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                {
+                    ci.Properties.Add(pi);
+                    propertyAccessors.AddRange(pi.GetAccessors(true));
+                    backingFieldNames.Add("<" + pi.Name + ">k__BackingField");
+                }
+
+                foreach (FieldInfo fi in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                {
+                    if (!backingFieldNames.Contains(fi.Name))
+                    {
+                        ci.Fields.Add(fi);
+                    }
+                }                   
+
                 foreach (System.Reflection.MethodInfo mi in t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
                 {
-                    if (IsExtensionMethod(mi))
+                    if (!propertyAccessors.Contains(mi))
                     {
-                        Type extType = mi.GetParameters()[0].ParameterType;
-                        NamespaceInfo extNi = new NamespaceInfo(extType.Namespace ?? "<global>");
-                        if (!ai.Namespaces.Any(n => n.Name == extNi.Name) && !IsExtensionClass(t))
-                            ai.Namespaces.Add(extNi);
+                        if (IsExtensionMethod(mi))
+                        {
+                            Type extType = mi.GetParameters()[0].ParameterType;
+                            NamespaceInfo extNi = new NamespaceInfo(extType.Namespace ?? "<global>");
+                            if (!ai.Namespaces.Any(n => n.Name == extNi.Name) && !IsExtensionClass(t))
+                                ai.Namespaces.Add(extNi);
+                            else
+                                extNi = ai.Namespaces.First(n => n.Name == extNi.Name);
+                            ClassInfo extCi = new ClassInfo(extType);
+                            if (!extNi.Classes.Any(n => n.ClassType.Name == extCi.ClassType.Name))
+                                extNi.Classes.Add(extCi);
+                            else
+                                extCi = extNi.Classes.First(n => n.ClassType.Name == extCi.ClassType.Name);
+                            extCi.Methods.Add(new MethodInfo(mi, true));
+                        }
                         else
-                            extNi = ai.Namespaces.First(n => n.Name == extNi.Name);
-                        ClassInfo extCi = new ClassInfo(extType.Name);
-                        if (!extNi.Classes.Any(n => n.Name == extCi.Name))
-                            extNi.Classes.Add(extCi);
-                        else
-                            extCi = extNi.Classes.First(n => n.Name == extCi.Name);
-                        extCi.Methods.Add(new MethodInfo("(extension) " + mi.ToString()));
-                    }
-                    else
-                        ci.Methods.Add(new MethodInfo(mi.ToString()));
+                            ci.Methods.Add(new MethodInfo(mi));
+                    }                   
                 }
                     
             }

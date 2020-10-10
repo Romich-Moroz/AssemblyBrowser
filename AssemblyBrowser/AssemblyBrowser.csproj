@@ -63,11 +63,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FieldConverter.cs" />
-    <Compile Include="Model.cs" />
-    <Compile Include="PropertyConverter.cs" />
-    <Compile Include="RelayCommand.cs" />
-    <Compile Include="Viewmodel.cs" />
+    <Compile Include="Viewmodel\Converters\ClassConverter.cs" />
+    <Compile Include="Viewmodel\Converters\ConstructorConverter.cs" />
+    <Compile Include="Viewmodel\Converters\FieldConverter.cs" />
+    <Compile Include="Viewmodel\Converters\TypenameBuilder.cs" />
+    <Compile Include="Viewmodel\Converters\MethodConverter.cs" />
+    <Compile Include="Model\Model.cs" />
+    <Compile Include="Viewmodel\RelayCommand.cs" />
+    <Compile Include="Viewmodel\Viewmodel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

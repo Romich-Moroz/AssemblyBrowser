@@ -5,11 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AssemblyBrowser"
         xmlns:disasm="clr-namespace:DisassemblerLib;assembly=Disassembler"
+        xmlns:reflection="clr-namespace:System.Reflection;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Assembly browser" Height="450" Width="800">
     <Window.Resources>
         <local:FieldConverter x:Key="FieldConverter"/>
-        <local:PropertyConverter x:Key="PropertyConverter"/>
+        <local:MethodConverter x:Key="MethodConverter"/>
+        <local:ClassConverter x:Key="ClassConverter"/>
+        <local:ConstructorConverter x:Key="ConstructorConverter"/>
     </Window.Resources>
     <Grid>
   
@@ -22,20 +25,24 @@
         </Menu>
         <TreeView Grid.Row="1" BorderThickness="0">
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type disasm:FieldInfo}">
+                <HierarchicalDataTemplate DataType="{x:Type reflection:FieldInfo}">
                     <TextBlock Text="{Binding Converter={StaticResource FieldConverter}}"/>
                 </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type disasm:PropertyInfo}">
-                    <TextBlock Text="{Binding Converter={StaticResource PropertyConverter}}"/>
+                <HierarchicalDataTemplate DataType="{x:Type reflection:PropertyInfo}">
+                    <TextBlock Text="{Binding Converter={StaticResource FieldConverter}}"/>
                 </HierarchicalDataTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type disasm:MethodInfo}">
-                    <TextBlock Text="{Binding Signature}"/>
+                    <TextBlock Text="{Binding Converter={StaticResource MethodConverter}}"/>
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type reflection:ConstructorInfo}">
+                    <TextBlock Text="{Binding Converter={StaticResource ConstructorConverter}}"/>
                 </HierarchicalDataTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type disasm:NamespaceInfo}" ItemsSource="{Binding Classes}">
                     <TextBlock Text="{Binding Name}"/>
                     <HierarchicalDataTemplate.ItemTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type disasm:ClassInfo}">
-                            <TreeViewItem Header="{Binding Name}">
+                            <TreeViewItem Header="{Binding Converter={StaticResource ClassConverter}}">
+                                <TreeViewItem Header="Constructors" ItemsSource="{Binding Constructors}"/>
                                 <TreeViewItem Header="Fields" ItemsSource="{Binding Fields}"/>
                                 <TreeViewItem Header="Properties" ItemsSource="{Binding Properties}"/>
                                 <TreeViewItem Header="Methods" ItemsSource="{Binding Methods}"/>
@@ -44,7 +51,7 @@
                     </HierarchicalDataTemplate.ItemTemplate>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
-            <TreeViewItem ItemsSource="{Binding SelectedAssemblyInfo.Namespaces}" Header="{Binding SelectedAssemblyInfo.Name}"/>
+            <TreeViewItem ItemsSource="{Binding SelectedAssemblyInfo.Namespaces}" Header="{Binding SelectedAssemblyInfo.Asm.FullName}"/>
         </TreeView>
     </Grid>
 </Window>

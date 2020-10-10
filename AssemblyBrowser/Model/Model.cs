@@ -2,7 +2,6 @@
 using Microsoft.Win32;
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace AssemblyBrowser
@@ -31,17 +30,5 @@ namespace AssemblyBrowser
             return d.Disassemble(asm);
         }
         
-    }
-    public static class MyExtensions
-    {
-        public static int WordCount(this string str)
-        {
-            return str.Split(new char[] { ' ', '.', '?' },
-                             StringSplitOptions.RemoveEmptyEntries).Length;
-        }
-        public static int Asd()
-        {
-            return 0;
-        }
-    }
+    }    
 }
