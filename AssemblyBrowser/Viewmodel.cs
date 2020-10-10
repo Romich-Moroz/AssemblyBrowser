@@ -6,7 +6,7 @@ namespace AssemblyBrowser
 {
     class Viewmodel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged = (sender,e) => { };
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private Model model = new Model();
 

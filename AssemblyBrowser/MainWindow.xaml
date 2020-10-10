@@ -7,7 +7,10 @@
         xmlns:disasm="clr-namespace:DisassemblerLib;assembly=Disassembler"
         mc:Ignorable="d"
         Title="Assembly browser" Height="450" Width="800">
-    
+    <Window.Resources>
+        <local:FieldConverter x:Key="FieldConverter"/>
+        <local:PropertyConverter x:Key="PropertyConverter"/>
+    </Window.Resources>
     <Grid>
   
         <Grid.RowDefinitions>
@@ -20,10 +23,10 @@
         <TreeView Grid.Row="1" BorderThickness="0">
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type disasm:FieldInfo}">
-                    <TextBlock Text="{Binding FieldName}"/>
+                    <TextBlock Text="{Binding Converter={StaticResource FieldConverter}}"/>
                 </HierarchicalDataTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type disasm:PropertyInfo}">
-                    <TextBlock Text="{Binding PropertyName}"/>
+                    <TextBlock Text="{Binding Converter={StaticResource PropertyConverter}}"/>
                 </HierarchicalDataTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type disasm:MethodInfo}">
                     <TextBlock Text="{Binding Signature}"/>

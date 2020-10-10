@@ -8,20 +8,24 @@ namespace DisassemblerLib
 {
     public class PropertyInfo
     {
+        public Type PropertyType { get; set; }
         public string PropertyName { get; set; }
 
-        public PropertyInfo(string PropertyName)
+        public PropertyInfo(Type PropertyType, string PropertyName)
         {
+            this.PropertyType = PropertyType;
             this.PropertyName = PropertyName;
         }
     }
 
     public class FieldInfo
     {
+        public Type FieldType { get; set; }
         public string FieldName { get; set; }
 
-        public FieldInfo(string FieldName)
+        public FieldInfo(Type FieldType, string FieldName)
         {
+            this.FieldType = FieldType;
             this.FieldName = FieldName;
         }
     }
@@ -80,9 +84,9 @@ namespace DisassemblerLib
                 ClassInfo ci = new ClassInfo(t.Name);
                 ni.Classes.Add(ci);
                 foreach (System.Reflection.FieldInfo fi in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                    ci.Fields.Add(new FieldInfo(fi.FieldType.Name +' ' + fi.Name));
+                    ci.Fields.Add(new FieldInfo(fi.FieldType, fi.Name));
                 foreach (System.Reflection.PropertyInfo pi in t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                    ci.Properties.Add(new PropertyInfo(pi.PropertyType.Name + ' ' + pi.Name));
+                    ci.Properties.Add(new PropertyInfo(pi.PropertyType, pi.Name));
                 foreach (System.Reflection.MethodInfo mi in t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
                 {
                     if (IsExtensionMethod(mi))
