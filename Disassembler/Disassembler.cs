@@ -69,48 +69,41 @@ namespace DisassemblerLib
                     ni.Classes.Add(ci);
 
                     foreach (ConstructorInfo pi in t.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                        ci.Constructors.Add(pi);
-
-                    List<System.Reflection.MethodInfo> propertyAccessors = new List<System.Reflection.MethodInfo>();
-                    List<string> backingFieldNames = new List<string>();
+                        if (Attribute.GetCustomAttribute(pi, typeof(CompilerGeneratedAttribute)) == null)
+                            ci.Constructors.Add(pi);
 
                     foreach (PropertyInfo pi in t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                    {
-                        ci.Properties.Add(pi);
-                        propertyAccessors.AddRange(pi.GetAccessors(true));
-                        backingFieldNames.Add("<" + pi.Name + ">k__BackingField");
-                    }
+                        if (Attribute.GetCustomAttribute(pi, typeof(CompilerGeneratedAttribute)) == null)
+                            ci.Properties.Add(pi);
 
                     foreach (FieldInfo fi in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                    {
-                        if (!backingFieldNames.Contains(fi.Name))
-                        {
-                            ci.Fields.Add(fi);
-                        }
-                    }
+                        if (Attribute.GetCustomAttribute(fi, typeof(CompilerGeneratedAttribute)) == null)
+                                ci.Fields.Add(fi);
 
                     foreach (System.Reflection.MethodInfo mi in t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
                     {
-                        if (!propertyAccessors.Contains(mi))
+                        if (IsExtensionMethod(mi))
                         {
-                            if (IsExtensionMethod(mi))
-                            {
-                                Type extType = mi.GetParameters()[0].ParameterType;
-                                NamespaceInfo extNi = new NamespaceInfo(extType.Namespace ?? "<global>");
-                                if (!ai.Namespaces.Any(n => n.Name == extNi.Name) && !IsExtensionClass(t))
-                                    ai.Namespaces.Add(extNi);
-                                else
-                                    extNi = ai.Namespaces.First(n => n.Name == extNi.Name);
-                                ClassInfo extCi = new ClassInfo(extType);
-                                if (!extNi.Classes.Any(n => n.ClassType.Name == extCi.ClassType.Name))
-                                    extNi.Classes.Add(extCi);
-                                else
-                                    extCi = extNi.Classes.First(n => n.ClassType.Name == extCi.ClassType.Name);
-                                extCi.Methods.Add(new MethodInfo(mi, true));
-                            }
+                            Type extType = mi.GetParameters()[0].ParameterType;
+                            NamespaceInfo extNi = new NamespaceInfo(extType.Namespace ?? "<global>");
+                            if (!ai.Namespaces.Any(n => n.Name == extNi.Name) && !IsExtensionClass(t))
+                                ai.Namespaces.Add(extNi);
                             else
+                                extNi = ai.Namespaces.First(n => n.Name == extNi.Name);
+                            ClassInfo extCi = new ClassInfo(extType);
+                            if (!extNi.Classes.Any(n => n.ClassType.Name == extCi.ClassType.Name))
+                                extNi.Classes.Add(extCi);
+                            else
+                                extCi = extNi.Classes.First(n => n.ClassType.Name == extCi.ClassType.Name);
+                            if (Attribute.GetCustomAttribute(mi, typeof(CompilerGeneratedAttribute)) == null)
+                                extCi.Methods.Add(new MethodInfo(mi, true));
+                        }
+                        else
+                        {
+                            if (Attribute.GetCustomAttribute(mi, typeof(CompilerGeneratedAttribute)) == null)
                                 ci.Methods.Add(new MethodInfo(mi));
                         }
+                            
                     }
                 }        
             }

@@ -78,6 +78,8 @@ namespace DisassemblerTest
                     CollectionAssert.AllItemsAreUnique(c.Fields);
                     CollectionAssert.AllItemsAreNotNull(c.Properties);
                     CollectionAssert.AllItemsAreUnique(c.Properties);
+                    CollectionAssert.AllItemsAreNotNull(c.Constructors);
+                    CollectionAssert.AllItemsAreUnique(c.Constructors);
                 }
             }            
         }
@@ -85,26 +87,12 @@ namespace DisassemblerTest
         [TestMethod]
         public void MembersValuesTest()
         {
-            foreach (NamespaceInfo n in actual.Namespaces)
-            {
-                foreach (ClassInfo c in n.Classes)
-                {
-                    foreach(FieldInfo m in c.Fields)
-                    {
-                        Assert.IsNotNull(m.Name);
-                        Assert.IsNotNull(m.FieldType);
-                    }
-                    foreach (PropertyInfo p in c.Properties)
-                    {
-                        Assert.IsNotNull(p.Name);
-                        Assert.IsNotNull(p.PropertyType);
-                    }
-                    foreach (DisassemblerLib.MethodInfo m in c.Methods)
-                    {
-                        Assert.IsNotNull(m.Info);
-                    }
-                }
-            }
+            Assert.AreEqual("<global>", actual.Namespaces[0].Name);
+            Assert.AreEqual("DisassemblerTest", actual.Namespaces[1].Name);
+            Assert.AreEqual("System", actual.Namespaces[2].Name);
+            Assert.AreEqual(typeof(Foo), actual.Namespaces[1].Classes[0].ClassType);
+            Assert.AreEqual(typeof(MyExtensions), actual.Namespaces[1].Classes[1].ClassType);
+            Assert.AreEqual("CreateFromFuncs", actual.Namespaces[1].Classes[0].Methods[0].Info.Name);
         }
     }
 }
