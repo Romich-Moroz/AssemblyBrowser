@@ -12,9 +12,9 @@ namespace AssemblyBrowser
         {
             MethodInfo m = value as MethodInfo;
 
-            string typeNameGenArgs = TypenameBuilder.BuildTypename(m.Info.ReturnType.Name, m.Info.ReturnType.GetGenericArguments());
-            string nameGenArgs = TypenameBuilder.BuildTypename(m.Info.Name, m.Info.GetGenericArguments());
-            string parameters = '(' + string.Join(",", m.Info.GetParameters().Select(p => TypenameBuilder.BuildTypename(p.ParameterType.Name, p.ParameterType.GetGenericArguments())+ ' ' + p.Name)) + ')';
+            string typeNameGenArgs = TypenameBuilder.BuildTypename(m.Info.ReturnType.Name, m.Info.ReturnType.GetGenericArguments(),true);
+            string nameGenArgs = TypenameBuilder.BuildTypename(m.Info.Name, m.Info.GetGenericArguments(),false);
+            string parameters = '(' + string.Join(",", m.Info.GetParameters().Select(p => TypenameBuilder.BuildTypename(p.ParameterType.Name, p.ParameterType.GetGenericArguments(), true) + ' ' + p.Name)) + ')';
             string ext = m.IsExtension ? "(extension) " : null;
             return ext + typeNameGenArgs + ' ' + nameGenArgs + parameters;
             

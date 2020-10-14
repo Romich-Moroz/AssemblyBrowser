@@ -15,7 +15,7 @@ namespace AssemblyBrowser
 
             Type[] genArguments = (value as FieldInfo)?.FieldType.GetGenericArguments() ?? (value as PropertyInfo)?.PropertyType.GetGenericArguments();
 
-            return TypenameBuilder.BuildTypename(typeName, genArguments) +' ' + fieldName;               
+            return TypenameBuilder.BuildTypename(typeName, genArguments,true) +' ' + fieldName;               
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

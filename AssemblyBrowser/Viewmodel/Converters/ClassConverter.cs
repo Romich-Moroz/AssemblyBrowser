@@ -11,7 +11,7 @@ namespace AssemblyBrowser
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             ClassInfo c = value as ClassInfo;
-            return TypenameBuilder.BuildTypename(c.ClassType.Name, c.ClassType.GetGenericArguments());
+            return TypenameBuilder.BuildTypename(c.ClassType.Name, c.ClassType.GetGenericArguments(),true);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
