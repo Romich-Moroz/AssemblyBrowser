@@ -68,17 +68,14 @@ namespace DisassemblerLib
 
                     ni.Classes.Add(ci);
 
-                    foreach (ConstructorInfo pi in t.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                        if (Attribute.GetCustomAttribute(pi, typeof(CompilerGeneratedAttribute)) == null)
-                            ci.Constructors.Add(pi);
+                    ci.Constructors.AddRange(t.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                                    .Where(c => Attribute.GetCustomAttribute(c, typeof(CompilerGeneratedAttribute)) == null));
+                    
+                    ci.Properties.AddRange(t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                                .Where(p => Attribute.GetCustomAttribute(p, typeof(CompilerGeneratedAttribute)) == null));
 
-                    foreach (PropertyInfo pi in t.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                        if (Attribute.GetCustomAttribute(pi, typeof(CompilerGeneratedAttribute)) == null)
-                            ci.Properties.Add(pi);
-
-                    foreach (FieldInfo fi in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                        if (Attribute.GetCustomAttribute(fi, typeof(CompilerGeneratedAttribute)) == null)
-                                ci.Fields.Add(fi);
+                    ci.Fields.AddRange(t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                                .Where(f => Attribute.GetCustomAttribute(f, typeof(CompilerGeneratedAttribute)) == null));
 
                     foreach (System.Reflection.MethodInfo mi in t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
                     {

@@ -30,10 +30,6 @@ namespace DisassemblerTest
     [TestClass]
     public class UnitTest
     {
-
-        
-
-
         private static AssemblyInfo actual;
 
         [ClassInitialize]
